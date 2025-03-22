@@ -1,192 +1,197 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WinGo BDG Predictor</title>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            font-family: Arial, sans-serif;
-            flex-direction: column;
-            background: #000;
-            overflow: hidden;
-            position: relative;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WinGo BDG Predictor</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      font-family: Arial, sans-serif;
+      flex-direction: column;
+      background: #000;
+      overflow: hidden;
+      position: relative;
+    }
 
-        /* Dangerous Blue Animation */
-        body::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle, #0029ff, #000066, #000);
-            animation: pulse 5s infinite alternate;
-            z-index: -1;
-        }
+    /* Dynamic Smoke Background with Color Changing Animation */
+    #smoke {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle, #0029ff, #000066, #000);
+      background-size: 300% 300%;
+      animation: smokeMove 12s linear infinite, colorSync 3s ease-in-out infinite alternate;
+      z-index: -1;
+    }
 
-        @keyframes pulse {
-            0% {
-                transform: scale(1);
-                opacity: 0.8;
-            }
+    /* Uniform movement of the smoke background */
+    @keyframes smokeMove {
+      0% { background-position: 0% 0%; }
+      25% { background-position: 100% 0%; }
+      50% { background-position: 100% 100%; }
+      75% { background-position: 0% 100%; }
+      100% { background-position: 0% 0%; }
+    }
 
-            100% {
-                transform: scale(1.2);
-                opacity: 1;
-            }
-        }
+    /* Color animation for background elements */
+    @keyframes colorSync {
+      0% { background: radial-gradient(circle, #0029ff, #000066, #000); }
+      50% { background: radial-gradient(circle, #ff0000, #660000, #000); }
+      100% { background: radial-gradient(circle, #00ff00, #006600, #000); }
+    }
 
-        .container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            width: 90%;
-            max-width: 600px;
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.7);
-            border-radius: 10px;
-            border: 2px solid blue;
-        }
+    /* Border color animation for elements that have a border */
+    @keyframes borderSync {
+      0% { border-color: #0029ff; }
+      50% { border-color: #ff0000; }
+      100% { border-color: #00ff00; }
+    }
 
-        .title {
-            font-size: 24px;
-            font-weight: bold;
-            color: lime;
-            text-transform: uppercase;
-            margin-bottom: 10px;
-        }
+    /* Main container (LinearLayout) with synchronized background and border animations */
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 90%;
+      max-width: 600px;
+      padding: 20px;
+      background: radial-gradient(circle, #0029ff, #000066, #000);
+      border-radius: 10px;
+      border: 2px solid;
+      animation: colorSync 3s ease-in-out infinite alternate, borderSync 3s ease-in-out infinite alternate;
+    }
 
-        .box {
-            width: 100%;
-            padding: 15px;
-            margin: 5px 0;
-            background: rgba(0, 0, 255, 0.1);
-            border: 2px solid blue;
-            border-radius: 5px;
-            text-align: center;
-            font-size: 20px;
-            font-weight: bold;
-            color: white;
-        }
+    .title {
+      font-size: 24px;
+      font-weight: bold;
+      color: lime;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      animation: colorSync 3s ease-in-out infinite alternate;
+    }
 
-        .history {
-            width: 100%;
-            max-height: 150px;
-            overflow-y: auto;
-            font-size: 16px;
-        }
-    </style>
+    .box {
+      width: 100%;
+      padding: 15px;
+      margin: 5px 0;
+      background: rgba(0, 0, 255, 0.1);
+      border: 2px solid;
+      border-radius: 5px;
+      text-align: center;
+      font-size: 20px;
+      font-weight: bold;
+      color: white;
+      animation: colorSync 3s ease-in-out infinite alternate, borderSync 3s ease-in-out infinite alternate;
+    }
+
+    .history {
+      width: 100%;
+      max-height: 150px;
+      overflow-y: auto;
+      font-size: 16px;
+      border: 2px solid;
+      animation: colorSync 3s ease-in-out infinite alternate, borderSync 3s ease-in-out infinite alternate;
+    }
+  </style>
 </head>
-
 <body>
-    <div class="container">
-        <div class="title">RAVI AI PREDICTOR</div>
-        <div class="box" id="period">Loading Period...</div>
-        <div class="box" id="timer">00 : 00</div>
-        <div class="box" id="result">Predicting...</div>
-        <div class="box" id="opposite-result">Calculating...</div>
-        <div class="box history" id="history">HISTORY:<br></div>
-    </div>
+  <div id="smoke"></div>
+  <div class="container">
+    <div class="title">RAVI AI PREDICTOR</div>
+    <div class="box" id="period">Loading Period...</div>
+    <div class="box" id="timer">00 : 00</div>
+    <div class="box" id="result">Predicting...</div>
+    <div class="box" id="opposite-result">Calculating...</div>
+    <div class="box history" id="history">HISTORY:<br></div>
+  </div>
 
-    <script>
-        let latestPeriod = null;
-        let lastPrediction = "PREDICTING...";
-        let predictionHistory = [];
+  <script>
+    let latestPeriod = null;
+    let lastPrediction = "PREDICTING...";
+    let predictionHistory = [];
 
-        async function fetchCurrentGameIssue() {
-            const apiUrl = 'https://api.bdg88zf.com/api/webapi/GetGameIssue';
-            const requestData = {
-                typeId: 1,
-                language: 0,
-                random: "40079dcba93a48769c6ee9d4d4fae23f",
-                signature: "D12108C4F57C549D82B23A91E0FA20AE",
-                timestamp: Math.floor(Date.now() / 1000),
-            };
+    async function fetchCurrentGameIssue() {
+      const apiUrl = 'https://api.bdg88zf.com/api/webapi/GetGameIssue';
+      const requestData = {
+        typeId: 1,
+        language: 0,
+        random: "40079dcba93a48769c6ee9d4d4fae23f",
+        signature: "D12108C4F57C549D82B23A91E0FA20AE",
+        timestamp: Math.floor(Date.now() / 1000),
+      };
 
-            try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json;charset=UTF-8' },
-                    body: JSON.stringify(requestData),
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.code === 0) {
-                        const currentPeriod = data.data.issueNumber;
-                        if (currentPeriod !== latestPeriod) {
-                            latestPeriod = currentPeriod;
-                            document.getElementById('period').textContent = "PERIOD: " + latestPeriod;
-                            updatePrediction();
-                        }
-                    }
-                }
-            } catch (error) {
-                console.error("❌ Fetch error:", error);
+      try {
+        const response = await fetch(apiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+          body: JSON.stringify(requestData),
+        });
+        if (response.ok) {
+          const data = await response.json();
+          if (data.code === 0) {
+            const currentPeriod = data.data.issueNumber;
+            if (currentPeriod !== latestPeriod) {
+              latestPeriod = currentPeriod;
+              document.getElementById('period').textContent = "PERIOD: " + latestPeriod;
+              updatePrediction();
             }
+          }
         }
+      } catch (error) {
+        console.error("❌ Fetch error:", error);
+      }
+    }
 
-        function updatePrediction() {
-            const lastResults = ["BIG", "SMALL", "BIG", "BIG", "SMALL", "BIG", "SMALL"];
-            const counts = { "BIG": 0, "SMALL": 0 };
-            lastResults.forEach(r => counts[r]++);
+    function updatePrediction() {
+      const lastResults = ["BIG", "SMALL", "BIG", "BIG", "SMALL", "BIG", "SMALL"];
+      const counts = { "BIG": 0, "SMALL": 0 };
+      lastResults.forEach(r => counts[r]++);
 
-            // Improved Prediction Logic
-            let prediction = (counts["BIG"] > counts["SMALL"]) ? "SMALL" : "BIG";
+      let prediction = (counts["BIG"] > counts["SMALL"]) ? "SMALL" : "BIG";
+      if (Math.random() < 0.2) {
+        prediction = prediction === "BIG" ? "SMALL" : "BIG";
+      }
 
-            // Random Adjustment to Improve Accuracy
-            if (Math.random() < 0.2) {
-                prediction = prediction === "BIG" ? "SMALL" : "BIG";
-            }
+      lastPrediction = prediction;
+      const oppositeNumber = calculateOppositeNumber(prediction);
+      predictionHistory.unshift(`Period ${latestPeriod}: ${lastPrediction} (${oppositeNumber})`);
+      if (predictionHistory.length > 10) {
+        predictionHistory.pop();
+      }
+      document.getElementById("result").textContent = "PREDICTION: " + lastPrediction;
+      document.getElementById("opposite-result").textContent = "OPPOSITE: " + oppositeNumber;
+      document.getElementById("history").innerHTML = "HISTORY:<br>" + predictionHistory.join("<br>");
+    }
 
-            lastPrediction = prediction;
-            const oppositeNumber = calculateOppositeNumber(prediction);
+    function calculateOppositeNumber(prediction) {
+      const oppositeBase = prediction === "BIG" ? 50 : 5;
+      return oppositeBase + Math.floor(Math.random() * 5) + 1;
+    }
 
-            predictionHistory.unshift(`Period ${latestPeriod}: ${lastPrediction} (${oppositeNumber})`);
-            if (predictionHistory.length > 10) {
-                predictionHistory.pop();
-            }
-
-            document.getElementById("result").textContent = "PREDICTION: " + lastPrediction;
-            document.getElementById("opposite-result").textContent = "OPPOSITE: " + oppositeNumber;
-            document.getElementById("history").innerHTML = "HISTORY:<br>" + predictionHistory.join("<br>");
+    function startTimer() {
+      setInterval(() => {
+        const now = new Date();
+        const seconds = now.getSeconds();
+        const remainingSeconds = 60 - seconds;
+        document.getElementById("timer").textContent = `00 : ${("0" + remainingSeconds).slice(-2)}`;
+        if (seconds === 0) {
+          fetchCurrentGameIssue();
         }
+      }, 1000);
+    }
 
-        function calculateOppositeNumber(prediction) {
-            const oppositeBase = prediction === "BIG" ? 50 : 5;
-            return oppositeBase + Math.floor(Math.random() * 5) + 1;
-        }
-
-        function startTimer() {
-            setInterval(() => {
-                const now = new Date();
-                const seconds = now.getSeconds();
-                const remainingSeconds = 60 - seconds;
-                document.getElementById("timer").textContent = `00 : ${("0" + remainingSeconds).slice(-2)}`;
-
-                // Update Prediction at the Beginning of Each Minute
-                if (seconds === 0) {
-                    fetchCurrentGameIssue();
-                }
-            }, 1000);
-        }
-
-        // Auto-fetch every 5 seconds
-        setInterval(fetchCurrentGameIssue, 5000);
-        fetchCurrentGameIssue(); // Initial fetch
-        startTimer();
-    </script>
-
+    setInterval(fetchCurrentGameIssue, 5000);
+    fetchCurrentGameIssue();
+    startTimer();
+  </script>
 </body>
-
-                                              </html>
+</html>
