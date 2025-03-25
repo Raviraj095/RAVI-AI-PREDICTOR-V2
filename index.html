@@ -53,6 +53,15 @@
             background: rgba(255, 0, 0, 0.5);
         }
 
+        .history-box {
+            margin-top: 20px;
+            padding: 10px;
+            background: rgba(0, 0, 128, 0.5);
+            border-radius: 8px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
         #access-denied {
             color: red;
             font-size: 24px;
@@ -71,6 +80,7 @@
         <div class="title">RAVI 3.0 Predictor</div>
         <div class="box period-box" id="period">Loading Period...</div>
         <div class="box result-box" id="result">Predicting...</div>
+        <div class="history-box" id="history">History:</div>
     </div>
 
     <script>
@@ -92,7 +102,7 @@
             }
         }
 
-        // ✅ Fetch Current Game Period (Example)
+        // ✅ Fetch Current Game Period
         async function fetchCurrentGameIssue() {
             try {
                 const apiUrl = 'https://api.bdg88zf.com/api/webapi/GetGameIssue';
@@ -126,10 +136,45 @@
             }
         }
 
-        // ✅ Simulate Prediction
+        // ✅ Logic to determine Prediction and Opposite Number
+        function calculatePredictionAndOpposite(period) {
+            // Take the last digit of the period
+            const lastDigit = parseInt(period.slice(-1));
+
+            // Determine BIG or SMALL based on last digit
+            const isBig = lastDigit >= 5;
+            const prediction = isBig ? "BIG" : "SMALL";
+
+            // Generate opposite number
+            const oppositeNumber = isBig
+                ? Math.floor(Math.random() * 5) // If BIG, opposite is between 0-4
+                : Math.floor(Math.random() * 5) + 5; // If SMALL, opposite is between 5-9
+
+            return { prediction, oppositeNumber };
+        }
+
+        // ✅ Update Prediction and History
         function updatePrediction() {
-            const result = Math.random() > 0.5 ? "BIG" : "SMALL";
-            document.getElementById('result').textContent = `Prediction: ${result}`;
+            const { prediction, oppositeNumber } = calculatePredictionAndOpposite(latestPeriod);
+
+            // Display current prediction with opposite number
+            document.getElementById('result').textContent = `Prediction: ${prediction} (${oppositeNumber})`;
+
+            // Update history
+            updateHistory(latestPeriod, prediction, oppositeNumber);
+        }
+
+        // ✅ Update History Section
+        function updateHistory(period, prediction, oppositeNumber) {
+            const historyBox = document.getElementById('history');
+            const historyEntry = document.createElement('div');
+            historyEntry.textContent = `Period: ${period} → ${prediction} (${oppositeNumber})`;
+            historyBox.insertBefore(historyEntry, historyBox.firstChild);
+
+            // Keep only the latest 10 entries
+            if (historyBox.children.length > 10) {
+                historyBox.removeChild(historyBox.lastChild);
+            }
         }
 
         // ✅ Initialize
