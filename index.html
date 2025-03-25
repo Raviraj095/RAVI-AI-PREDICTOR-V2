@@ -3,7 +3,6 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RAVI 3.0 Predictor</title>
     <style>
         body {
@@ -21,39 +20,6 @@
             overflow: hidden;
         }
 
-        /* Splash Screen */
-        .splash {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: black;
-            color: lime;
-            font-size: 26px;
-            text-align: center;
-            z-index: 1000;
-            animation: fadeOut 5s forwards;
-        }
-
-        @keyframes fadeOut {
-            0% {
-                opacity: 1;
-            }
-
-            90% {
-                opacity: 1;
-            }
-
-            100% {
-                opacity: 0;
-                visibility: hidden;
-            }
-        }
-
         .container {
             width: 90%;
             max-width: 600px;
@@ -61,7 +27,6 @@
             background: rgba(0, 0, 0, 0.8);
             border-radius: 15px;
             box-shadow: 0 0 20px rgba(0, 255, 0, 0.5);
-            z-index: 1;
         }
 
         .title {
@@ -88,116 +53,57 @@
             background: rgba(255, 0, 0, 0.5);
         }
 
-        .analysis-section {
-            display: flex;
-            justify-content: space-between;
-            margin: 20px 0;
-        }
-
-        .analysis-box {
-            flex: 1;
-            padding: 15px;
-            margin: 5px;
-            border-radius: 8px;
-            text-align: center;
-        }
-
-        .green-box {
-            background: rgba(0, 128, 0, 0.7);
-        }
-
-        .blue-box {
-            background: rgba(0, 0, 255, 0.7);
-        }
-
-        .history {
-            padding: 15px;
-            border-radius: 8px;
-            background: rgba(0, 0, 0, 0.5);
-        }
-
         #access-denied {
-            display: none;
             color: red;
+            font-size: 24px;
         }
     </style>
 </head>
 
 <body>
 
-    <!-- Splash Screen -->
-    <div class="splash" id="splash">
-        AYUSH & SATYAM BETA KYA HAL HAI, RAVI PAPA KO BATA DO
-    </div>
-
-    <!-- Access Denied Message -->
-    <div id="access-denied">
+    <div id="access-denied" style="display: none;">
         <h2>Access Denied</h2>
-        <p>Your device is not authorized to access this predictor.</p>
+        <p>Your device is not authorized to view this predictor.</p>
     </div>
 
-    <!-- Predictor Content -->
-    <div id="predictor-container" class="container" style="display:none;">
-        <div class="title">RAVI 3.0</div>
+    <div class="container" id="predictor-container" style="display: none;">
+        <div class="title">RAVI 3.0 Predictor</div>
         <div class="box period-box" id="period">Loading Period...</div>
-        <div class="box result-box" id="result">PREDICTING...</div>
-
-        <div class="analysis-section">
-            <div class="analysis-box blue-box">WIN %<br>98%</div>
-            <div class="analysis-box green-box">Reverse - Mod<br>Active</div>
-        </div>
-
-        <div class="history" id="history">
-            <strong>History:</strong><br>
-        </div>
+        <div class="box result-box" id="result">Predicting...</div>
     </div>
 
     <script>
         let latestPeriod = null;
-        let predictionHistory = [];
 
-        // ✅ Check if the device is authorized
-        const approvedDevices = JSON.parse(localStorage.getItem('approvedDevices')) || [];
-        const currentDevice = navigator.userAgent;
-
-        if (approvedDevices.some(device => currentDevice.includes(device))) {
-            document.getElementById('predictor-container').style.display = 'block';
-        } else {
-            document.getElementById('access-denied').style.display = 'block';
+        // ✅ Device Authorization Check
+        function isDeviceAuthorized() {
+            const currentDevice = `${navigator.platform} | ${navigator.userAgent}`;
+            const approvedDevices = JSON.parse(localStorage.getItem('approvedDevices')) || [];
+            return approvedDevices.includes(currentDevice);
         }
 
-        // ✅ Improved Prediction Logic (Higher Win Rate within 1-2 Bets)
-        function getSmartPrediction() {
-            if (predictionHistory.length >= 2) {
-                let lastTwo = predictionHistory.slice(-2);
-                let bigCount = lastTwo.filter(p => p.result === "BIG").length;
-                let smallCount = 2 - bigCount;
-
-                if (bigCount === 2) return "SMALL";
-                if (smallCount === 2) return "BIG";
+        // ✅ Handle Access
+        function handleAccess() {
+            if (isDeviceAuthorized()) {
+                document.getElementById('predictor-container').style.display = 'block';
+            } else {
+                document.getElementById('access-denied').style.display = 'block';
             }
-            return Math.random() > 0.4 ? "BIG" : "SMALL";
         }
 
-        // ✅ Generate Opposite Number (Higher Accuracy)
-        function getOppositeNumber(prediction) {
-            return prediction === "BIG"
-                ? Math.floor(Math.random() * 2) + 4
-                : Math.floor(Math.random() * 2) + 6;
-        }
-
-        // ✅ Fetch Current Game Issue
+        // ✅ Fetch Current Game Period (Example)
         async function fetchCurrentGameIssue() {
-            const apiUrl = 'https://api.bdg88zf.com/api/webapi/GetGameIssue';
-            const requestData = {
-                typeId: 1,
-                language: 0,
-                random: "40079dcba93a48769c6ee9d4d4fae23f",
-                signature: "D12108C4F57C549D82B23A91E0FA20AE",
-                timestamp: 1727792520,
-            };
-
             try {
+                const apiUrl = 'https://api.bdg88zf.com/api/webapi/GetGameIssue';
+                const requestData = {
+                    typeId: 1,
+                    language: 0,
+                    random: "40079dcba93a48769c6ee9d4d4fae23f",
+                    signature: "D12108C4F57C549D82B23A91E0FA20AE",
+                    timestamp: 1727792520,
+                };
+
                 const response = await fetch(apiUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json;charset=UTF-8' },
@@ -208,39 +114,30 @@
                     const data = await response.json();
                     if (data.code === 0) {
                         const currentPeriod = data.data.issueNumber;
-
                         if (currentPeriod !== latestPeriod) {
                             latestPeriod = currentPeriod;
                             document.getElementById('period').textContent = `Period: ${latestPeriod}`;
-                            updatePrediction(currentPeriod);
+                            updatePrediction();
                         }
                     }
                 }
             } catch (error) {
-                console.error("❌ Fetch error:", error);
+                console.error('Error fetching period:', error);
             }
         }
 
-        // ✅ Update Prediction and History (Better Winning Odds)
-        function updatePrediction(period) {
-            const historyBox = document.getElementById('history');
-            const resultBox = document.getElementById('result');
-
-            const prediction = getSmartPrediction();
-            const oppositeNumber = getOppositeNumber(prediction);
-
-            predictionHistory.push({ period, result: prediction, opposite: oppositeNumber });
-            if (predictionHistory.length > 5) predictionHistory.shift();
-
-            resultBox.textContent = `Result: ${prediction} (${oppositeNumber})`;
-
-            historyBox.innerHTML = `<strong>History:</strong><br>` +
-                predictionHistory.map(p => `${p.period} &nbsp;&nbsp; ${p.result} (${p.opposite})`).join('<br>');
+        // ✅ Simulate Prediction
+        function updatePrediction() {
+            const result = Math.random() > 0.5 ? "BIG" : "SMALL";
+            document.getElementById('result').textContent = `Prediction: ${result}`;
         }
 
-        setInterval(fetchCurrentGameIssue, 5000);
-        fetchCurrentGameIssue(); 
-
+        // ✅ Initialize
+        handleAccess();
+        if (isDeviceAuthorized()) {
+            fetchCurrentGameIssue();
+            setInterval(fetchCurrentGameIssue, 5000);
+        }
     </script>
 
 </body>
